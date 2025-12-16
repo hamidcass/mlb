@@ -94,7 +94,7 @@ def prep_data_hr(dataset, inputs):
                     #add input metrics to row
                     for metric in inputs:
                         row[f"Current_{metric}"] = curr_season[metric]
-                        row[f"Target_{metric}"] = curr_season[metric]
+                        row[f"Target_{metric}"] = following_season[metric]
 
                     machine_learning_dataset.append(row)
     new_df = pd.DataFrame(machine_learning_dataset)
@@ -104,9 +104,9 @@ def prep_data_hr(dataset, inputs):
 
     pass
 
-data = pd.read_csv("batting.csv")
+data = pd.read_csv("../data_collection/batting.csv")
 
-target_stat = "HR"
+target_stat = "AVG"
 
 #get input metrics
 input_data = get_input_metrics(target_stat)

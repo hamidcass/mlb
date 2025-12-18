@@ -104,22 +104,46 @@ def prep_data_hr(dataset, inputs):
 
     pass
 
-data = pd.read_csv("../data_collection/batting.csv")
+# data = pd.read_csv("../data_collection/batting.csv")
 
-target_stat = "AVG"
+# target_stat = "AVG"
 
-#get input metrics
-input_data = get_input_metrics(target_stat)
+# #get input metrics
+# input_data = get_input_metrics(target_stat)
 
-if input_data:
-    ml_dataset = prep_data_hr(data, input_data)
-    print(f"ML Dataset shape: {ml_dataset.shape}")
-    print(f"Number of player-season pairs: {len(ml_dataset)}")
+# if input_data:
+#     ml_dataset = prep_data_hr(data, input_data)
+#     print(f"ML Dataset shape: {ml_dataset.shape}")
+#     print(f"Number of player-season pairs: {len(ml_dataset)}")
 
-    # Save
-    ml_dataset.to_csv('prepared_data.csv', index=False)
-    print("\n✓ ML data saved to prepared_data.csv")
+#     # Save
+#     ml_dataset.to_csv('prepared_data.csv', index=False)
+#     print("\n✓ ML data saved to prepared_data.csv")
 
-    # Preview
-    print("\nSample ML data:")
-    print(ml_dataset.head())
+#     # Preview
+#     print("\nSample ML data:")
+#     print(ml_dataset.head())
+
+def run(stat):
+    data = pd.read_csv("data_collection/batting.csv")
+
+    target_stat = stat
+
+    #get input metrics
+    input_data = get_input_metrics(target_stat)
+
+    if input_data:
+        ml_dataset = prep_data_hr(data, input_data)
+        print(f"ML Dataset shape: {ml_dataset.shape}")
+        print(f"Number of player-season pairs: {len(ml_dataset)}")
+
+        # Save
+        ml_dataset.to_csv('prepared_data.csv', index=False)
+        print("\n✓ ML data saved to prepared_data.csv")
+
+        # Preview
+        print("\nSample ML data:")
+        print(ml_dataset.head())
+
+    return ""
+        

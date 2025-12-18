@@ -65,7 +65,7 @@ def get_stats(stat):
                 'Barrel%',       # Elite contact
                 'xwOBA',         # Expected wOBA (similar to OPS)
         ]
-    elif stat == "wRC":
+    elif stat == "wRC+":
         return [
             'Age',           # Context
             'PA',            # Playing time

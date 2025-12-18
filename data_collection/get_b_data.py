@@ -23,19 +23,48 @@ def fetch_data(min_year, max_year, min_pa=200):
     return all_years_data
 
 
-print("Beginning the batting data collection...")
-batting_data = fetch_data(2020, 2025, 200)
+# print("Beginning the batting data collection...")
+# batting_data = fetch_data(2020, 2025, 200)
 
-print(f"\nTotal records: {len(batting_data)}")
-print(f"Total unique players: {batting_data['Name'].nunique()}")
+# print(f"\nTotal records: {len(batting_data)}")
+# print(f"Total unique players: {batting_data['Name'].nunique()}")
 
-#we dont want rookies or 1 szn players
-player_count = batting_data['Name'].value_counts()
-multi_year_players = player_count[player_count > 1]
-print(f"Players with 2+ seasons: {len(multi_year_players)}")
+# #we dont want rookies or 1 szn players
+# player_count = batting_data['Name'].value_counts()
+# multi_year_players = player_count[player_count > 1]
+# print(f"Players with 2+ seasons: {len(multi_year_players)}")
 
-only_multi_year_players = batting_data[batting_data['Name'].isin(multi_year_players.index)]
-print(f"Total records after filtering: {len(only_multi_year_players)}")
-print(f"Total unique players after filtering: {only_multi_year_players['Name'].nunique()}")
+# only_multi_year_players = batting_data[batting_data['Name'].isin(multi_year_players.index)]
+# print(f"Total records after filtering: {len(only_multi_year_players)}")
+# print(f"Total unique players after filtering: {only_multi_year_players['Name'].nunique()}")
 
-only_multi_year_players.to_csv("batting.csv", index=False)
+# only_multi_year_players.to_csv("batting.csv", index=False)
+
+
+def run():
+
+    print("Enter Minimum Player Plate Appearances (Default: 200)")
+    choice = input(">>>Enter Min PA:    ")
+    #TODO: error check
+
+    print("Fetching Data from the 2020-2024 season...")
+    batting_data = fetch_data(2020, 2025, int(choice))
+    print(f"\nTotal records: {len(batting_data)}")
+    print(f"Total players: {batting_data['Name'].nunique()}")
+
+    #we dont want rookies or 1 szn players
+    player_count = batting_data['Name'].value_counts()
+    multi_year_players = player_count[player_count > 1]
+    print(f"Players with 2+ seasons: {len(multi_year_players)}")
+
+    only_multi_year_players = batting_data[batting_data['Name'].isin(multi_year_players.index)]
+    print(f"Total records after filtering: {len(only_multi_year_players)}")
+    print(f"Total unique players after filtering: {only_multi_year_players['Name'].nunique()}")
+
+    only_multi_year_players.to_csv("batting.csv", index=False)
+
+    #TODO: change to not be hardcoded lol
+    file_path = "../data_collection_batting.csv"
+    return file_path
+
+        

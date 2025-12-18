@@ -4,6 +4,7 @@ import numpy as np
 #ML models
 from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
 '''
 Models used:
@@ -22,7 +23,7 @@ RIDGE (Linear + Regularization)
     + Linear but better against outliers
 
 '''
-
+#returns the appropriate input features based on what the target stat is 
 def get_stats(stat):
     if stat == "HR":
         return [
@@ -81,14 +82,16 @@ def get_stats(stat):
     else:
         return None
 
+#looks in df and extracts the feature column data and the target stat data
+#returns: x (2d list: first season features), y (1d list: nect season output stat)
 def get_features(training_data, stats, target_stat):
     x_cols = [f"Current_{stat}" for stat in stats]
-    y_cols = [f"Target_{target_stat}"]
+    y_col = f"Target_{target_stat}"
     x = training_data[x_cols]
-    y = training_data[y_cols]
+    y = training_data[y_col]
     return x, y
 
-
+#take any rows from 2024->2025 because we dont want 2025 stats in our training data (it will be our test data instead)
 def get_target_data(training_data):
     target_data = training_data[training_data["Next_Season"] == 2025].copy()
     training_data = training_data[training_data["Next_Season"] != 2025].copy()
@@ -96,26 +99,26 @@ def get_target_data(training_data):
     print(f"Training data: {len(training_data)} rows (2025 removed)")
     return target_data, training_data
 
+#Predicts using Linear regression
 def lin_reg(x_train, y_train, x_test, y_test, test_data, target_stat):
-    from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+    
     
     model = LinearRegression()
-    model.fit(x_train, y_train)
-    print("\n✓ MODEL TRAINED")
+    model.fit(x_train, y_train) #give model the features and output
+    print("\n***Model has been trained using linear regression***")
 
     predictions = model.predict(x_test).flatten()
+
     y_test_values = y_test.values.flatten()
-    
-    # Calculate metrics
+
+
     mae = mean_absolute_error(y_test_values, predictions)
 
-    r2 = r2_score(y_test_values, predictions)
     
     print(f"\n{'='*60}")
-    print("PERFORMANCE METRICS")
+    print("LINEAR REGRESSION")
     print(f"{'='*60}")
-    print(f"Mean Absolute Error (MAE): {mae:.2f} HR")
-    print(f"R² Score:                  {r2:.3f}")
+    print(f"Mean Absolute Error (MAE): {mae:.3f} {target_stat}")
     print(f"\nInterpretation: On average, predictions are off by {mae:.2f} home runs")
 
     for i in range(min(5, len(predictions))):
@@ -136,7 +139,97 @@ def lin_reg(x_train, y_train, x_test, y_test, test_data, target_stat):
             "AVG": "0.3f"
         }
 
-        print(f"  {player:20s} | Predicted: {pred:{formats.get(target_stat)}} {target_stat} | Actual: {actual:{formats.get(target_stat)}} {target_stat} | Error: {error:4.1f}")
+        print(f"  {player:20s} | Predicted: {pred:{formats.get(target_stat)}} {target_stat} | Actual: {actual:{formats.get(target_stat)}} {target_stat} | Error: {error:{formats.get(target_stat)}}")
+
+def random_forest(x_train, y_train, x_test, y_test, test_data, target_stat):
+
+    model = RandomForestRegressor(
+        n_estimators=100, #how many trees do we want (more = better but slower)
+        max_depth=10, #how deep can each tree go (deeper = smarter but can overfit and longer)
+        random_state=42, #reproducibility (42 is standard)
+    )
+    model.fit(x_train, y_train)
+
+    print("\n***Model has been trained using random forest***")
+
+    predictions = model.predict(x_test).flatten()
+    y_test_values = y_test.values.flatten()
+    
+    # Calculate metrics
+    mae = mean_absolute_error(y_test_values, predictions)
+
+    
+    print(f"\n{'='*60}")
+    print("RANDOM FOREST")
+    print(f"{'='*60}")
+    print(f"Mean Absolute Error (MAE): {mae:.3f} {target_stat}")
+    print(f"\nInterpretation: On average, predictions are off by {mae:.2f} home runs")
+
+    for i in range(min(5, len(predictions))):
+        player = test_data.iloc[i]['Name']
+        pred = predictions[i]
+        actual = y_test_values[i]
+        
+        # Handle if pred/actual are arrays instead of scalars
+        if hasattr(pred, '__len__'):
+            pred = pred[0]  # Extract first element if it's an array
+        if hasattr(actual, '__len__'):
+            actual = actual[0]
+            
+        error = abs(pred - actual)
+
+        formats = {
+            "HR": "5.1f",
+            "AVG": "0.3f"
+        }
+
+        print(f"  {player:20s} | Predicted: {pred:{formats.get(target_stat)}} {target_stat} | Actual: {actual:{formats.get(target_stat)}} {target_stat} | Error: {error:{formats.get(target_stat)}}")
+
+def ridge(x_train, y_train, x_test, y_test, test_data, target_stat):
+    model = Ridge(alpha=1.0)
+    model.fit(x_train, y_train)
+    print("\n***Model has been trained using ridge***")
+
+    predictions = model.predict(x_test).flatten()
+
+    y_test_values = y_test.values.flatten()
+
+
+    mae = mean_absolute_error(y_test_values, predictions)
+
+    
+    print(f"\n{'='*60}")
+    print("RIDGE")
+    print(f"{'='*60}")
+    print(f"Mean Absolute Error (MAE): {mae:.3f} {target_stat}")
+    print(f"\nInterpretation: On average, predictions are off by {mae:.2f} home runs")
+
+    for i in range(min(5, len(predictions))):
+        player = test_data.iloc[i]['Name']
+        pred = predictions[i]
+        actual = y_test_values[i]
+        
+        # Handle if pred/actual are arrays instead of scalars
+        if hasattr(pred, '__len__'):
+            pred = pred[0]  # Extract first element if it's an array
+        if hasattr(actual, '__len__'):
+            actual = actual[0]
+            
+        error = abs(pred - actual)
+
+        formats = {
+            "HR": "5.1f",
+            "AVG": "0.3f"
+        }
+
+        print(f"  {player:20s} | Predicted: {pred:{formats.get(target_stat)}} {target_stat} | Actual: {actual:{formats.get(target_stat)}} {target_stat} | Error: {error:{formats.get(target_stat)}}")
+
+
+
+
+
+
+
 
 training_data = pd.read_csv("../data_prep/prepared_data.csv") 
 
@@ -148,8 +241,9 @@ target_stat = "AVG"
 stats = get_stats(target_stat)
 
 x_train, y_train = get_features(training_data, stats, target_stat)
-
 x_test, y_test = get_features(target_data, stats, target_stat)
 
 
 learned_data = lin_reg(x_train, y_train, x_test, y_test, target_data, target_stat) 
+learned_data = random_forest(x_train, y_train, x_test, y_test, target_data, target_stat) 
+learned_data = ridge(x_train, y_train, x_test, y_test, target_data, target_stat) 

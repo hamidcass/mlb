@@ -2,6 +2,8 @@ import pandas as pd
 
 #we need to prep the data so that the model can notice patterns to train off
 
+
+
 def get_input_metrics(stat):
     if stat == "HR":
         return [
@@ -61,7 +63,6 @@ def get_input_metrics(stat):
         return None
 
 
-
 def prep_data_hr(dataset, inputs):
     #current year (input metrics) -> following year (output metric)
     
@@ -89,6 +90,8 @@ def prep_data_hr(dataset, inputs):
                         "Name": player,
                         "Current_Season": curr_season["Season"],
                         "Next_Season": following_season["Season"],
+                        "Current_Team": curr_season["Team"], 
+                        "Next_Team": following_season["Team"],
                     }
 
                     #add input metrics to row
@@ -138,7 +141,7 @@ def run(stat):
         print(f"Number of player-season pairs: {len(ml_dataset)}")
 
         # Save
-        ml_dataset.to_csv('prepared_data.csv', index=False)
+        ml_dataset.to_csv('data_prep/prepared_data.csv', index=False)
         print("\n✓ ML data saved to prepared_data.csv")
 
         # Preview

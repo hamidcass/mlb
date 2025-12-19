@@ -61,7 +61,7 @@ def run():
     print(f"Total records after filtering: {len(only_multi_year_players)}")
     print(f"Total unique players after filtering: {only_multi_year_players['Name'].nunique()}")
 
-    only_multi_year_players.to_csv("batting.csv", index=False)
+    only_multi_year_players.to_csv("data_collection/batting.csv", index=False)
 
     #TODO: change to not be hardcoded lol
     file_path = "../data_collection_batting.csv"

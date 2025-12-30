@@ -452,7 +452,7 @@ if run_button or 'results' in st.session_state:
                 """
                 - ***Agreements:*** Between all models, strikeout rate (K%) and age were among top negative influencers on OPS performance.
                 - ***Disagreements:*** Tree based models heavily penalized HardHit% and xwOBA, while linear models favored them as positive contributors.
-                - ***Conclusion:***: Linear models seem to more accurately understand baseball logic. Tree based models struggle more because their non-linear nature uses certain stats as anchors too heavily, leading to counterintuitive results.
+                - ***Conclusion:*** Linear models seem to more accurately understand baseball logic. Tree based models struggle more because their non-linear nature uses certain stats as anchors too heavily, leading to counterintuitive results.
                 """
             )
         elif target_stat == "AVG":

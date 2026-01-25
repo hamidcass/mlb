@@ -6,6 +6,7 @@ import joblib  # For loading saved model pipelines
 import boto3
 from urllib.parse import urlparse
 import os
+from storage.db import write_df_to_db
 
 results = {}
 
@@ -91,10 +92,15 @@ def run_eval(models_uri, features_uri, output_uri, target_stat):
         metrics, result_df = evaluate_model(model_pipeline, features_df, target_stat)
 
         #save results for the given model
-        save_dataframe(result_df, f"{output_uri}/{model_name}_predictions.parquet")
+        # save_dataframe(result_df, f"{output_uri}/{model_name}_predictions.parquet")
+
+        #write to db
+        write_df_to_db(result_df, f"{model_name.lower()}_predictions")
 
         #store metrics in dict
         results[model_name] = metrics
+        metrics_df = pd.DataFrame([metrics])
+        write_df_to_db(metrics_df, f"{model_name.lower()}_metrics")
 
         print(f"{model_name} - MAE: {metrics['MAE']:.4f}, R2: {metrics['R2']:.4f}")
 

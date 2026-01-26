@@ -17,27 +17,33 @@ engine = create_engine(DATABASE_URL)
 def root():
     return {"message": "MLB Prediction API is running."}
 
-@app.get("/predictions/{model_name}")
-def get_predictions(model_name: str, limit: int = 20):
+@app.get("/predictions")
+def get_predictions(stat: str, model: str, limit: int = 20):
     
     """
         Retrieve the latest predictions for a specified model
-        Ex: /predictions/XGBoost
+        Ex: /predictions?stat=HR&model=XGBoost
     """
 
-    table_name = f"{model_name.lower()}_predictions"
-
     q = text(f"""
-        SELECT * FROM {table_name}
+        SELECT * 
+        FROM predictions
+        WHERE stat = :stat
+        AND model = :model
         ORDER BY player_name
         LIMIT :limit
              """)
     
     try:
         with engine.connect() as conn:
-            result = conn.execute(q, {"limit": limit})
+            result = conn.execute(q, {"stat": stat, "model": model, "limit": limit})
             rows = [dict(row._mapping) for row in result]
-        return {"model": model_name, "count": len(rows), "predictions": rows}
+        return {
+            "stat": stat,
+            "model": model,
+            "count": len(rows),
+            "predictions": rows
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     
@@ -49,24 +55,51 @@ def get_player_prediction(player_name: str):
         Ex: /player/Mike Trout
     """
 
-    models = ["linear_regression", "ridge", "random_forest", "xgboost"]
-    output = {}
+  
 
     try:
+        q = text(f"""
+            SELECT * 
+            FROM predictions
+            WHERE "Player" ILIKE :player
+            ORDER BY "Next_Season" DESC
+            LIMIT 1
+                    """)
+
+
+
         with engine.connect() as conn:
-            for model in models:
-                q = text(f"""
-                    SELECT * FROM {model}_predictions
-                    WHERE "Player" ILIKE :player
-                    ORDER BY "Next_Season" DESC
-                    LIMIT 1
-                            """)
                 result = conn.execute(q, {"player": f"%{player_name}%"})
-                row = result.fetchone()
-                if row:
-                    output[model] = dict(row._mapping)
-        if not output:
+                rows = [dict(row._mapping) for row in result]
+           
+        if not rows:
             raise HTTPException(status_code=404, detail="Player not found")
-        return {"player": player_name, "predictions": output}
+        
+        return {
+            "player": player_name,
+            "count": len(rows),
+            "predictions": rows
+        }
+    
+
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    
+
+@app.get("/meta")
+def get_metadata():
+    try:
+        q = text("""
+            SELECT DISTINCT stat, model
+            FROM predictions
+            ORDER BY stat, model
+        """)
+
+        with engine.connect() as conn:
+            result = conn.execute(q)
+            rows = [dict(row._mapping) for row in result]
+
+        return {"available_combinations": rows}
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

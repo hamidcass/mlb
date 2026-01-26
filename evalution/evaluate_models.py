@@ -76,13 +76,17 @@ def run_eval(models_uri, features_uri, output_uri, target_stat):
 
     print(f"Loading trained models from {models_uri}")
 
-    model_files = ["Linear_Regression.pkl", "Ridge.pkl", "Random_Forest.pkl", "XGBoost.pkl"]
- 
-    for model_file in model_files:
-        model_name = model_file.replace(".pkl", "")
+    
+    model_files = {
+    "LinearRegression": f"{target_stat}_LinearRegression.pkl",
+    "Ridge": f"{target_stat}_Ridge.pkl",
+    "RandomForest": f"{target_stat}_RandomForest.pkl",
+    "XGBoost": f"{target_stat}_XGBoost.pkl"
+    }   
+
+    for model_name, model_file in model_files.items():
         print(f"Evaluating model: {model_name}")
 
-        # model_pipeline = joblib.load(f"{models_uri}/{model_file}")
         s3_model_uri = f"{models_uri}/{model_file}"
         local_model_path = f"/tmp/{model_file}"
 
@@ -91,16 +95,14 @@ def run_eval(models_uri, features_uri, output_uri, target_stat):
 
         metrics, result_df = evaluate_model(model_pipeline, features_df, target_stat)
 
-        #save results for the given model
-        # save_dataframe(result_df, f"{output_uri}/{model_name}_predictions.parquet")
+        # Save predictions
+        write_df_to_db(result_df, f"{target_stat.lower()}_{model_name.lower()}_predictions")
 
-        #write to db
-        write_df_to_db(result_df, f"{model_name.lower()}_predictions")
-
-        #store metrics in dict
-        results[model_name] = metrics
+        # Save metrics
         metrics_df = pd.DataFrame([metrics])
-        write_df_to_db(metrics_df, f"{model_name.lower()}_metrics")
+        write_df_to_db(metrics_df, f"{target_stat.lower()}_{model_name.lower()}_metrics")
+
+        results[model_name] = metrics
 
         print(f"{model_name} - MAE: {metrics['MAE']:.4f}, R2: {metrics['R2']:.4f}")
 

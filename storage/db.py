@@ -1,7 +1,10 @@
 from sqlalchemy import create_engine
 import psycopg2
 from psycopg2.extras import execute_values
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 DB_USER = os.getenv("DB_USER")
 DB_PASS = os.getenv("DB_PASS")

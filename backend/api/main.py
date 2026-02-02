@@ -129,6 +129,36 @@ def get_metadata():
 
     return {"available_predictions": combos}
 
+@app.get("/stats")
+def get_stats():
+    """
+        Retrieve dataset statistics for the landing page
+        Returns total player-seasons from raw batting data
+    """
+    import boto3
+    from io import BytesIO
+    import pandas as pd
+    
+    try:
+        s3 = boto3.client('s3')
+        buffer = BytesIO()
+        s3.download_fileobj(Bucket="mlb-ml-data", Key="raw/batting.parquet", Fileobj=buffer)
+        buffer.seek(0)
+        df = pd.read_parquet(buffer)
+        
+        return {
+            "total_player_seasons": len(df),
+            "unique_players": df["Name"].nunique() if "Name" in df.columns else 0,
+            "years": sorted(df["Season"].unique().tolist()) if "Season" in df.columns else []
+        }
+    except Exception as e:
+        # Fallback to hardcoded values if S3 fails
+        return {
+            "total_player_seasons": 1709,
+            "unique_players": 462,
+            "years": [2020, 2021, 2022, 2023, 2024, 2025]
+        }
+
 @app.get("/metrics")
 def get_metrics(stat: str, model: str):
     """

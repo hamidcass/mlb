@@ -69,8 +69,8 @@ export default function Predictions() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Zoom state
-    const [zoomLevel, setZoomLevel] = useState(100);
+    // Zoom state (10 = no zoom, 100 = max zoom)
+    const [zoomLevel, setZoomLevel] = useState(10);
     const [panX, setPanX] = useState(50);
     const [panY, setPanY] = useState(50);
 
@@ -81,7 +81,7 @@ export default function Predictions() {
     const handleRunPredictions = async () => {
         setLoading(true);
         setError(null);
-        setZoomLevel(100);
+        setZoomLevel(10);
         setPanX(50);
         setPanY(50);
         setSearchQuery("");
@@ -120,9 +120,10 @@ export default function Predictions() {
     const baseMax = dataMax + dataRange * 0.05;
     const fullRange = baseMax - baseMin;
 
-    // Calculate zoomed domain
+    // Calculate zoomed domain (invert zoomLevel so 100 = full view, lower = more zoom)
     const zoomedDomain = useMemo(() => {
-        const viewRange = (fullRange * zoomLevel) / 100;
+        const effectiveZoom = 110 - zoomLevel; // Invert: slider 10 = view 100%, slider 100 = view 10%
+        const viewRange = (fullRange * effectiveZoom) / 100;
         const halfView = viewRange / 2;
         const centerX = baseMin + (fullRange * panX) / 100;
         const centerY = baseMin + (fullRange * panY) / 100;
@@ -143,7 +144,7 @@ export default function Predictions() {
     }, [predictions, searchQuery]);
 
     const handleResetZoom = () => {
-        setZoomLevel(100);
+        setZoomLevel(10);
         setPanX(50);
         setPanY(50);
     };
@@ -334,7 +335,7 @@ export default function Predictions() {
                                 onChange={(e) => setZoomLevel(Number(e.target.value))}
                                 className="zoom-slider"
                             />
-                            <span className="zoom-value">{Math.round(100 / zoomLevel * 100)}%</span>
+                            <span className="zoom-value">{Math.round(zoomLevel / 10)}x</span>
                         </div>
                         <div className="zoom-control-group">
                             <label>Pan X</label>
@@ -345,7 +346,7 @@ export default function Predictions() {
                                 value={panX}
                                 onChange={(e) => setPanX(Number(e.target.value))}
                                 className="zoom-slider"
-                                disabled={zoomLevel === 100}
+                                disabled={zoomLevel === 10}
                             />
                         </div>
                         <div className="zoom-control-group">
@@ -357,7 +358,7 @@ export default function Predictions() {
                                 value={panY}
                                 onChange={(e) => setPanY(Number(e.target.value))}
                                 className="zoom-slider"
-                                disabled={zoomLevel === 100}
+                                disabled={zoomLevel === 10}
                             />
                         </div>
                         <button className="btn-reset" onClick={handleResetZoom}>

@@ -1,22 +1,34 @@
-import React from 'react';
+import { NavLink } from 'react-router-dom';
 import '../styles/Navbar.css';
 
-const Navbar: React.FC = () => {
+const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        <div className="navbar-logo">
-          <a href="/">Logo</a>
-        </div>
+        <NavLink to="/" className="navbar-logo">
+
+          <span className="logo-text">MLB<span className="logo-accent">Projections</span></span>
+        </NavLink>
         <ul className="nav-menu">
           <li className="nav-item">
-            <a href="/" className="nav-link">Home</a>
+            <NavLink to="/" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"} end>
+              Home
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a href="/about" className="nav-link">About</a>
+            <NavLink to="/predictions" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+              Predictions
+            </NavLink>
           </li>
           <li className="nav-item">
-            <a href="/contact" className="nav-link">Contact</a>
+            <NavLink to="/search" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+              Player Search
+            </NavLink>
+          </li>
+          <li className="nav-item">
+            <NavLink to="/next-season" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
+              Next Season
+            </NavLink>
           </li>
         </ul>
       </div>

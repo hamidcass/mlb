@@ -1,14 +1,13 @@
-export default function Search() {
+export default function NextSeason() {
     return (
         <div className="page-container">
             <header className="hero-header">
-                <h1>Player Search</h1>
+                <h1>Next Season</h1>
                 <p className="subtitle">
                     <span className="highlight">Coming Soon</span>
                 </p>
                 <p className="hero-description">
-                    Search for individual players to view their projected stats across
-                    all models and compare predictions against actual performance.
+                    View the projected stats for the upcoming 2026 MLB season.
                 </p>
             </header>
 

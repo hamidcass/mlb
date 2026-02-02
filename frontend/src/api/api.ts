@@ -36,3 +36,9 @@ export async function fetchImportance(stat: string, model: string) {
     if (!res.ok) throw new Error("Failed to fetch importance");
     return res.json();
 }
+
+export async function fetchStats() {
+    const res = await fetch(`${BASE_URL}/stats`);
+    if (!res.ok) throw new Error("Failed to fetch stats");
+    return res.json();
+}

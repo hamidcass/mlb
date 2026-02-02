@@ -50,7 +50,7 @@ TARGET_STATS = ["HR", "AVG", "OPS", "wRC_PLUS"]
 
 #ingest raw data
 run_ingestion(
-    start_year=2020,
+    start_year=2016,
     end_year=2025,
     min_pa=200,
     # output_uri="data/raw/batting.parquet",

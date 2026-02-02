@@ -233,3 +233,115 @@ def get_importance(stat: str, model: str):
         }
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Could not load importance data: {str(e)}")
+
+
+@app.get("/players")
+def get_players():
+    """
+        Retrieve list of all unique players with their latest info
+        Used for the player search dropdown
+    """
+    import boto3
+    from io import BytesIO
+    import pandas as pd
+    
+    try:
+        # Get unique player names from predictions table
+        q = text("""
+            SELECT DISTINCT "Player"
+            FROM ops_linearregression_predictions
+            ORDER BY "Player"
+        """)
+        
+        with engine.connect() as conn:
+            result = conn.execute(q)
+            player_names = [row._mapping["Player"] for row in result]
+        
+        # Load raw batting data from S3 to get Team/Age/PA
+        s3 = boto3.client('s3')
+        buffer = BytesIO()
+        s3.download_fileobj(Bucket="mlb-ml-data", Key="raw/batting.parquet", Fileobj=buffer)
+        buffer.seek(0)
+        df = pd.read_parquet(buffer)
+        
+        # Get latest season data for each player
+        latest_df = df.sort_values("Season", ascending=False).drop_duplicates("Name", keep="first")
+        
+        players = []
+        for name in player_names:
+            player_data = latest_df[latest_df["Name"] == name]
+            if not player_data.empty:
+                row = player_data.iloc[0]
+                players.append({
+                    "Player": name,
+                    "Team": row.get("Team", "N/A"),
+                    "Age": int(row.get("Age", 0)) if pd.notna(row.get("Age")) else None,
+                    "PA": int(row.get("PA", 0)) if pd.notna(row.get("PA")) else None
+                })
+            else:
+                players.append({
+                    "Player": name,
+                    "Team": "N/A",
+                    "Age": None,
+                    "PA": None
+                })
+        
+        return {
+            "count": len(players),
+            "players": players
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/player-history/{player_name}")
+def get_player_history(player_name: str):
+    """
+        Retrieve historical OPS data for a player across seasons
+        Returns actual OPS from raw batting data for the chart
+    """
+    import boto3
+    from io import BytesIO
+    import pandas as pd
+    
+    try:
+        # Load raw batting data from S3
+        s3 = boto3.client('s3')
+        buffer = BytesIO()
+        s3.download_fileobj(Bucket="mlb-ml-data", Key="raw/batting.parquet", Fileobj=buffer)
+        buffer.seek(0)
+        df = pd.read_parquet(buffer)
+        
+        # Filter for the player (case-insensitive partial match)
+        player_df = df[df["Name"].str.lower().str.contains(player_name.lower())]
+        
+        if player_df.empty:
+            raise HTTPException(status_code=404, detail="Player not found")
+        
+        # Get OPS by season, sorted
+        history = player_df[["Season", "OPS"]].sort_values("Season")
+        
+        # Get 2025 prediction for OPS from LinearRegression
+        pred_q = text("""
+            SELECT "Predicted"
+            FROM ops_linearregression_predictions
+            WHERE "Player" ILIKE :player
+            LIMIT 1
+        """)
+        
+        predicted_2025 = None
+        with engine.connect() as conn:
+            result = conn.execute(pred_q, {"player": f"%{player_name}%"})
+            row = result.fetchone()
+            if row:
+                predicted_2025 = row._mapping["Predicted"]
+        
+        return {
+            "player": player_name,
+            "history": history.to_dict(orient="records"),
+            "predicted_2025_ops": predicted_2025
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

@@ -850,3 +850,267 @@ nav a.active {
 .stat-card:nth-child(4) {
   animation-delay: 0.5s;
 }
+
+/* ========================================
+   Search Page Styles
+   ======================================== */
+
+.search-page {
+  padding-top: 8rem;
+}
+
+.search-header {
+  margin-bottom: 2rem;
+}
+
+.search-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.search-dropdown-container {
+  position: relative;
+  max-width: 100%;
+}
+
+.search-dropdown-input {
+  width: 100%;
+  padding: 1rem 2.5rem 1rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.search-dropdown-input:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px var(--accent-cyan-dim);
+}
+
+.search-dropdown-input::placeholder {
+  color: var(--text-muted);
+}
+
+.dropdown-arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.search-dropdown-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  z-index: 100;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.search-dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border-color);
+  transition: background 0.2s ease;
+}
+
+.search-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.search-dropdown-item:hover {
+  background: rgba(77, 201, 255, 0.1);
+}
+
+.search-dropdown-item .player-name {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.search-dropdown-item .player-team {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* Player Title */
+.player-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.player-position {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+/* Player Info Section */
+.player-info-section {
+  margin: 1.5rem 0 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.player-info-grid {
+  display: flex;
+  gap: 4rem;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.info-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.team-badge {
+  color: var(--accent-cyan);
+}
+
+/* Prediction Summary Section */
+.prediction-summary-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(145deg, rgba(77, 201, 255, 0.05) 0%, transparent 100%);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+}
+
+.prediction-title {
+  color: var(--accent-cyan);
+}
+
+.model-badge {
+  font-weight: 400;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.prediction-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 700px) {
+  .prediction-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.prediction-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.prediction-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--accent-coral);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.prediction-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.prediction-diff {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  width: fit-content;
+  margin-top: 0.25rem;
+}
+
+.prediction-diff.positive {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+.prediction-diff.negative {
+  background: rgba(244, 63, 94, 0.2);
+  color: #f43f5e;
+}
+
+.prediction-grade {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+/* History Section */
+.history-section {
+  margin: 2.5rem 0;
+  animation: fadeInUp 0.6s ease-out 0.3s both;
+}
+
+.history-chart-container {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+/* Loading & Empty States */
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-secondary);
+}
+
+.loading-state p,
+.empty-state p {
+  font-size: 1.1rem;
+  margin: 0;
+}

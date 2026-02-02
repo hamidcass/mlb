@@ -39,6 +39,19 @@ export async function fetchImportance(stat: string, model: string) {
 
 export async function fetchStats() {
     const res = await fetch(`${BASE_URL}/stats`);
+    console.log(res)
     if (!res.ok) throw new Error("Failed to fetch stats");
+    return res.json();
+}
+
+export async function fetchPlayers() {
+    const res = await fetch(`${BASE_URL}/players`);
+    if (!res.ok) throw new Error("Failed to fetch players");
+    return res.json();
+}
+
+export async function fetchPlayerHistory(playerName: string) {
+    const res = await fetch(`${BASE_URL}/player-history/${encodeURIComponent(playerName)}`);
+    if (!res.ok) throw new Error("Failed to fetch player history");
     return res.json();
 }

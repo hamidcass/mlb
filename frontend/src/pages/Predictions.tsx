@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
     ScatterChart,
     Scatter,
@@ -78,7 +78,8 @@ export default function Predictions() {
     const [searchQuery, setSearchQuery] = useState("");
     const [highlightedPlayer, setHighlightedPlayer] = useState<string | null>(null);
 
-    const handleRunPredictions = async () => {
+    // Auto-load predictions on mount with default settings (XGBoost + OPS)
+    const loadPredictions = async (stat: string, modelName: string) => {
         setLoading(true);
         setError(null);
         setZoomLevel(10);
@@ -88,15 +89,15 @@ export default function Predictions() {
         setHighlightedPlayer(null);
         try {
             const [predData, metricsData] = await Promise.all([
-                fetchAllPredictions(targetStat, model),
-                fetchMetrics(targetStat, model)
+                fetchAllPredictions(stat, modelName),
+                fetchMetrics(stat, modelName)
             ]);
             setPredictions(predData.predictions || []);
             setMetrics(metricsData);
 
             // Try to fetch importance (may fail for some models)
             try {
-                const importanceData = await fetchImportance(targetStat, model);
+                const importanceData = await fetchImportance(stat, modelName);
                 setImportance(importanceData.features || []);
             } catch {
                 setImportance([]);
@@ -109,6 +110,17 @@ export default function Predictions() {
         } finally {
             setLoading(false);
         }
+    };
+
+    // Load default predictions on page mount
+    useEffect(() => {
+        loadPredictions(targetStat, model);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+
+    const handleRunPredictions = () => {
+        loadPredictions(targetStat, model);
     };
 
     // Calculate base domain

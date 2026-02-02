@@ -11,6 +11,8 @@ app = FastAPI(title="MLB Prediction API")
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
+    "http://localhost:5174",
+    "http://127.0.0.1:5174",
 ]
 
 app.add_middleware(
@@ -35,7 +37,7 @@ def root():
     return {"message": "MLB Prediction API is running."}
 
 @app.get("/predictions")
-def get_predictions(stat: str, model: str, limit: int = 20):
+def get_predictions(stat: str, model: str, limit: int = 10000):
     
     """
         Retrieve the latest predictions for a specified model
@@ -126,3 +128,78 @@ def get_metadata():
     ]
 
     return {"available_predictions": combos}
+
+@app.get("/metrics")
+def get_metrics(stat: str, model: str):
+    """
+        Retrieve model performance metrics (MAE, R2) for a specified stat/model
+        Ex: /metrics?stat=HR&model=XGBoost
+    """
+    table_name = f"{stat.lower()}_{model.lower()}_metrics"
+
+    q = text(f"""
+        SELECT * 
+        FROM {table_name}
+        LIMIT 1
+    """)
+    
+    try:
+        with engine.connect() as conn:
+            result = conn.execute(q)
+            row = result.fetchone()
+            if row:
+                metrics = dict(row._mapping)
+                return {
+                    "stat": stat,
+                    "model": model,
+                    "MAE": metrics.get("MAE"),
+                    "R2": metrics.get("R2"),
+                    "Num_Players": metrics.get("Num_Players")
+                }
+            else:
+                raise HTTPException(status_code=404, detail="Metrics not found")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@app.get("/importance")
+def get_importance(stat: str, model: str):
+    """
+        Retrieve feature importance data for a specified stat/model
+        Ex: /importance?stat=OPS&model=XGBoost
+    """
+    import boto3
+    from io import BytesIO
+    import pandas as pd
+    
+    # Map model names to match file naming convention
+    model_map = {
+        "xgboost": "XGBoost",
+        "randomforest": "RandomForest", 
+        "linearregression": "LinearRegression",
+        "ridge": "Ridge"
+    }
+    
+    model_key = model_map.get(model.lower(), model)
+    s3_uri = f"s3://mlb-ml-data/models/importance_{stat.upper()}_{model_key}.parquet"
+    
+    try:
+        s3 = boto3.client('s3')
+        path = s3_uri[5:]
+        bucket, key = path.split("/", 1)
+        
+        buffer = BytesIO()
+        s3.download_fileobj(Bucket=bucket, Key=key, Fileobj=buffer)
+        buffer.seek(0)
+        df = pd.read_parquet(buffer)
+        
+        # Sort by importance and return top features
+        df = df.sort_values("Importance", ascending=False)
+        
+        return {
+            "stat": stat,
+            "model": model,
+            "features": df.to_dict(orient="records")
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Could not load importance data: {str(e)}")

@@ -1,18 +1,21 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, NavLink } from "react-router-dom";
 import Home from "./pages/Home";
-import Models from "./pages/Models";
+import Predictions from "./pages/Predictions";
+import Search from "./pages/Search";
 
 export default function App() {
   return (
     <BrowserRouter>
-      <nav style={{ padding: "10px", borderBottom: "1px solid gray" }}>
-        <Link to="/">Player Search</Link> |{" "}
-        <Link to="/models">Model Performance</Link>
+      <nav>
+        <NavLink to="/" end>Home</NavLink>
+        <NavLink to="/predictions">Predictions</NavLink>
+        <NavLink to="/search">Player Search</NavLink>
       </nav>
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/models" element={<Models />} />
+        <Route path="/predictions" element={<Predictions />} />
+        <Route path="/search" element={<Search />} />
       </Routes>
     </BrowserRouter>
   );

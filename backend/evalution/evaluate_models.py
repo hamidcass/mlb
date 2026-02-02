@@ -50,7 +50,8 @@ def evaluate_model(model_pipeline, features_df, target_stat):
         "Predicted": predictions,
         "Error": predictions - y,
         "Abs_Error": np.abs(predictions - y),
-        "Pct_Error": (predictions - y) / y * 100
+        # Safe division to avoid infinity when actual is 0 (e.g., 0 HR)
+        "Pct_Error": np.where(y != 0, (predictions - y) / y * 100, 0)
     })
 
     metrics = {
@@ -73,6 +74,11 @@ def run_eval(models_uri, features_uri, output_uri, target_stat):
 
     print(f"Loading features from {features_uri}")
     features_df = load_dataframe(features_uri)
+
+    # CRITICAL: Filter for 2025 predictions only (test set)
+    # This ensures one row per player and proper evaluation metrics
+    features_df = features_df[features_df["Next_Season"] == 2025].copy()
+    print(f"Filtered to {len(features_df)} players for 2025 predictions")
 
     print(f"Loading trained models from {models_uri}")
 

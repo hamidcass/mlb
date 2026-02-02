@@ -16,4 +16,4 @@ DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{
 engine = create_engine(DATABASE_URL)
 
 def write_df_to_db(df, table_name):
-    df.to_sql(table_name, engine, if_exists="append", index=False)
+    df.to_sql(table_name, engine, if_exists="replace", index=False)

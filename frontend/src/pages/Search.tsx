@@ -51,15 +51,23 @@ function getGradeColor(grade: string): string {
     return "#f43f5e";
 }
 
+// Model options for the dropdown
+const MODEL_OPTIONS = [
+    { value: "linearregression", label: "Linear Regression" },
+    { value: "ridge", label: "Ridge" },
+    { value: "randomforest", label: "Random Forest" },
+    { value: "xgboost", label: "XGBoost" },
+];
+
 export default function Search() {
     const [players, setPlayers] = useState<Player[]>([]);
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
     const [playerPredictions, setPlayerPredictions] = useState<PlayerPrediction[]>([]);
     const [playerHistory, setPlayerHistory] = useState<HistoryPoint[]>([]);
-    const [predicted2025, setPredicted2025] = useState<number | null>(null);
     const [loading, setLoading] = useState(false);
     const [showDropdown, setShowDropdown] = useState(false);
+    const [selectedModel, setSelectedModel] = useState("xgboost");
 
     // Load players list on mount
     useEffect(() => {
@@ -88,10 +96,9 @@ export default function Search() {
             const predData = await fetchPlayer(player.Player);
             setPlayerPredictions(predData.predictions || []);
 
-            // Fetch historical data
+            // Fetch historical data (for actual OPS by season)
             const historyData = await fetchPlayerHistory(player.Player);
             setPlayerHistory(historyData.history || []);
-            setPredicted2025(historyData.predicted_2025_ops);
         } catch (err) {
             console.error("Error fetching player data:", err);
         } finally {
@@ -99,12 +106,16 @@ export default function Search() {
         }
     };
 
-    // Get OPS prediction (using Linear Regression as shown in mockup)
+    // Get OPS prediction based on selected model
     const opsPrediction = playerPredictions.find(
-        (p) => p.stat === "OPS" && p.model === "linearregression"
+        (p) => p.stat === "OPS" && p.model === selectedModel
     );
 
-    // Prepare chart data with prediction point
+
+    // Get model display name
+    const selectedModelLabel = MODEL_OPTIONS.find(m => m.value === selectedModel)?.label || selectedModel;
+
+    // Prepare chart data with prediction point - uses selected model's prediction
     const chartData = useMemo(() => {
         const data: { Season: number; Actual: number | undefined; Predicted: number | null }[] =
             playerHistory.map((h) => ({
@@ -113,28 +124,29 @@ export default function Search() {
                 Predicted: null as number | null,
             }));
 
-        // Add 2025 prediction point if available
-        if (predicted2025 !== null) {
+        // Add 2025 prediction point from selected model
+        const modelPrediction = opsPrediction?.Predicted ?? null;
+        if (modelPrediction !== null) {
             const existing2025 = data.find((d) => d.Season === 2025);
             if (existing2025) {
-                existing2025.Predicted = predicted2025;
+                existing2025.Predicted = modelPrediction;
             } else {
                 data.push({
                     Season: 2025,
                     Actual: opsPrediction?.Actual,
-                    Predicted: predicted2025,
+                    Predicted: modelPrediction,
                 });
             }
         }
 
         return data.sort((a, b) => a.Season - b.Season);
-    }, [playerHistory, predicted2025, opsPrediction]);
+    }, [playerHistory, opsPrediction]);
 
     return (
         <div className="page-container search-page">
             {/* Search Header */}
             <div className="search-header">
-                <label className="search-label">🔍 Search or select a player</label>
+                <label className="search-label">Search for a player</label>
                 <div className="search-dropdown-container">
                     <input
                         type="text"
@@ -197,10 +209,26 @@ export default function Search() {
                     {/* Prediction Summary Section */}
                     {opsPrediction && (
                         <section className="prediction-summary-section">
-                            <h2 className="section-title prediction-title">
-                                Prediction Summary{" "}
-                                <span className="model-badge">(Linear Regression)</span>
-                            </h2>
+                            <div className="prediction-header">
+                                <h2 className="section-title prediction-title">
+                                    Prediction Summary{" "}
+                                    <span className="model-badge">({selectedModelLabel})</span>
+                                </h2>
+                                <div className="model-selector">
+                                    <label className="model-selector-label">Model:</label>
+                                    <select
+                                        className="model-select"
+                                        value={selectedModel}
+                                        onChange={(e) => setSelectedModel(e.target.value)}
+                                    >
+                                        {MODEL_OPTIONS.map((opt) => (
+                                            <option key={opt.value} value={opt.value}>
+                                                {opt.label}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
                             <div className="prediction-cards">
                                 <div className="prediction-card">
                                     <span className="prediction-label">Predicted 2025 OPS</span>
@@ -297,10 +325,10 @@ export default function Search() {
                                             name="Prediction"
                                             connectNulls={false}
                                         />
-                                        {predicted2025 !== null && (
+                                        {opsPrediction && (
                                             <ReferenceDot
                                                 x={2025}
-                                                y={predicted2025}
+                                                y={opsPrediction.Predicted}
                                                 r={6}
                                                 fill="#ff6b5b"
                                                 stroke="#ff6b5b"

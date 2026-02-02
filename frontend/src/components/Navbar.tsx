@@ -7,7 +7,7 @@ const Navbar = () => {
       <div className="navbar-container">
         <NavLink to="/" className="navbar-logo">
 
-          <span className="logo-text">MLB<span className="logo-accent">Projections</span></span>
+          <span className="logo-text">Dugout<span className="logo-accent">Data</span></span>
         </NavLink>
         <ul className="nav-menu">
           <li className="nav-item">
@@ -25,11 +25,11 @@ const Navbar = () => {
               Player Search
             </NavLink>
           </li>
-          <li className="nav-item">
+          {/* <li className="nav-item">
             <NavLink to="/next-season" className={({ isActive }) => isActive ? "nav-link active" : "nav-link"}>
               Next Season
             </NavLink>
-          </li>
+          </li> */}
         </ul>
       </div>
     </nav>

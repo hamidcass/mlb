@@ -1,6 +1,6 @@
 
 // TODO: change to deployment URL when deploying
-const BASE_URL = "http://127.0.0.1:8000";
+const BASE_URL = "http://15.223.209.71:8000/predictions";
 
 export async function fetchPlayer(playerName: string) {
     const res = await fetch(`${BASE_URL}/player/${encodeURIComponent(playerName)}`);

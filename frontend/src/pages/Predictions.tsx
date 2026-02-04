@@ -553,7 +553,7 @@ export default function Predictions() {
             {/* Info Banner */}
             <div className="info-banner">
                 Predict 2025 player stats using 9 years of historical data, advanced sabermetrics,
-                and state-of-the-art ML models. Configure your settings and click Run Predictions to get started.
+                and various ML models. Configure your settings and click Run Predictions to get started.
             </div>
         </div>
     );

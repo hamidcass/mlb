@@ -182,7 +182,8 @@ export default function Search() {
                 <>
                     {/* Player Name */}
                     <h1 className="player-title">
-                        {selectedPlayer.Player} <span className="player-position">1B</span>
+                        {selectedPlayer.Player}
+                        {/* {selectedPlayer.Player} <span className="player-position">1B</span> */}
                     </h1>
 
                     {/* Player Info Section */}

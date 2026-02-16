@@ -276,10 +276,6 @@ def get_importance(stat: str, model: str):
         Retrieve feature importance data for a specified stat/model
         Ex: /importance?stat=OPS&model=XGBoost
     """
-    import boto3
-    from io import BytesIO
-    import pandas as pd
-    
     model = clean_model_name(model)
     
     # Map model names to match file naming convention
@@ -289,30 +285,73 @@ def get_importance(stat: str, model: str):
         "linearregression": "LinearRegression",
         "ridge": "Ridge"
     }
-    
     model_key = model_map.get(model.lower(), model)
-    s3_uri = f"s3://mlb-ml-data/models/importance_{stat.upper()}_{model_key}.parquet"
+    filename = f"importance_{stat.upper()}_{model_key}.parquet"
+
+    # 1) Try local parquet files first
+    script_dir = Path(__file__).parent.resolve()
+    backend_dir = script_dir.parent
+    local_paths = [
+        backend_dir / "data" / "importance" / filename,
+        Path("data") / "importance" / filename,
+        Path("backend") / "data" / "importance" / filename,
+    ]
     
+    for path in local_paths:
+        try:
+            df = pd.read_parquet(path)
+            df = df.sort_values("Importance", ascending=False)
+            print(f"/importance: Loaded from local file {path}")
+            return {
+                "stat": stat,
+                "model": model,
+                "features": df.to_dict(orient="records")
+            }
+        except Exception:
+            pass
+
+    # 2) Try database
     try:
-        s3 = boto3.client('s3')
-        path = s3_uri[5:]
-        bucket, key = path.split("/", 1)
+        table_name = f"{stat.lower()}_{model.lower()}_importance"
+        q = text(f"""
+            SELECT *
+            FROM {table_name}
+            ORDER BY "Importance" DESC
+        """)
+        with engine.connect() as conn:
+            result = conn.execute(q)
+            rows = [dict(row._mapping) for row in result]
+        if rows:
+            print(f"/importance: Loaded from DB table {table_name}")
+            return {
+                "stat": stat,
+                "model": model,
+                "features": rows
+            }
+    except Exception as db_err:
+        print(f"/importance: DB lookup failed: {db_err}")
+
+    # 3) Fallback to S3
+    try:
+        import boto3
+        from io import BytesIO
         
+        s3_key = f"models/{filename}"
+        s3 = boto3.client('s3')
         buffer = BytesIO()
-        s3.download_fileobj(Bucket=bucket, Key=key, Fileobj=buffer)
+        s3.download_fileobj(Bucket="mlb-ml-data", Key=s3_key, Fileobj=buffer)
         buffer.seek(0)
         df = pd.read_parquet(buffer)
-        
-        # Sort by importance and return top features
         df = df.sort_values("Importance", ascending=False)
-        
+        print(f"/importance: Loaded from S3 {s3_key}")
         return {
             "stat": stat,
             "model": model,
             "features": df.to_dict(orient="records")
         }
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Could not load importance data: {str(e)}")
+    except Exception as s3_err:
+        print(f"/importance: All sources failed. S3 error: {s3_err}")
+        raise HTTPException(status_code=400, detail="Could not load importance data from any source")
 
 
 @app.get("/players")

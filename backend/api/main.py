@@ -20,6 +20,8 @@ origins = [
     "http://127.0.0.1:8000",
     "https://main.d310rgog3a4st0.amplifyapp.com",
     "https://api.inningai.dev",
+    "https://inningai.dev",
+    "https://www.inningai.dev",
 ]
 
 app.add_middleware(

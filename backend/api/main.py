@@ -277,8 +277,28 @@ def get_importance(stat: str, model: str):
         Ex: /importance?stat=OPS&model=XGBoost
     """
     model = clean_model_name(model)
-    
-    # Map model names to match file naming convention
+    table_name = f"{stat.lower()}_{model.lower()}_importance"
+
+    # 1) Try database first (same as /predictions and /metrics)
+    try:
+        q = text(f"""
+            SELECT *
+            FROM {table_name}
+            ORDER BY "Importance" DESC
+        """)
+        with engine.connect() as conn:
+            result = conn.execute(q)
+            rows = [dict(row._mapping) for row in result]
+        if rows:
+            return {
+                "stat": stat,
+                "model": model,
+                "features": rows
+            }
+    except Exception as db_err:
+        print(f"/importance: DB lookup failed for {table_name}: {db_err}")
+
+    # 2) Fallback to local parquet files
     model_map = {
         "xgboost": "XGBoost",
         "randomforest": "RandomForest", 
@@ -288,13 +308,11 @@ def get_importance(stat: str, model: str):
     model_key = model_map.get(model.lower(), model)
     filename = f"importance_{stat.upper()}_{model_key}.parquet"
 
-    # 1) Try local parquet files first
     script_dir = Path(__file__).parent.resolve()
     backend_dir = script_dir.parent
     local_paths = [
         backend_dir / "data" / "importance" / filename,
         Path("data") / "importance" / filename,
-        Path("backend") / "data" / "importance" / filename,
     ]
     
     for path in local_paths:
@@ -310,48 +328,7 @@ def get_importance(stat: str, model: str):
         except Exception:
             pass
 
-    # 2) Try database
-    try:
-        table_name = f"{stat.lower()}_{model.lower()}_importance"
-        q = text(f"""
-            SELECT *
-            FROM {table_name}
-            ORDER BY "Importance" DESC
-        """)
-        with engine.connect() as conn:
-            result = conn.execute(q)
-            rows = [dict(row._mapping) for row in result]
-        if rows:
-            print(f"/importance: Loaded from DB table {table_name}")
-            return {
-                "stat": stat,
-                "model": model,
-                "features": rows
-            }
-    except Exception as db_err:
-        print(f"/importance: DB lookup failed: {db_err}")
-
-    # 3) Fallback to S3
-    try:
-        import boto3
-        from io import BytesIO
-        
-        s3_key = f"models/{filename}"
-        s3 = boto3.client('s3')
-        buffer = BytesIO()
-        s3.download_fileobj(Bucket="mlb-ml-data", Key=s3_key, Fileobj=buffer)
-        buffer.seek(0)
-        df = pd.read_parquet(buffer)
-        df = df.sort_values("Importance", ascending=False)
-        print(f"/importance: Loaded from S3 {s3_key}")
-        return {
-            "stat": stat,
-            "model": model,
-            "features": df.to_dict(orient="records")
-        }
-    except Exception as s3_err:
-        print(f"/importance: All sources failed. S3 error: {s3_err}")
-        raise HTTPException(status_code=400, detail="Could not load importance data from any source")
+    raise HTTPException(status_code=400, detail="Could not load importance data")
 
 
 @app.get("/players")

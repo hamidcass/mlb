@@ -1,6 +1,5 @@
 
-// TODO: change to deployment URL when deploying
-const BASE_URL = "http://15.223.209.71:8000/predictions";
+const BASE_URL = "https://api.inningai.dev";
 
 export async function fetchPlayer(playerName: string) {
     const res = await fetch(`${BASE_URL}/player/${encodeURIComponent(playerName)}`);

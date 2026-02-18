@@ -295,36 +295,38 @@ export default function Predictions() {
                         Top factors driving {model} predictions for {targetStat}
                     </p>
                     <div className="importance-chart-container">
-                        <ResponsiveContainer width="100%" height={300}>
-                            <BarChart
-                                data={importanceChartData}
-                                layout="vertical"
-                                margin={{ top: 10, right: 30, left: 100, bottom: 10 }}
-                            >
-                                <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
-                                <XAxis type="number" tick={{ fill: "#8b949e" }} />
-                                <YAxis
-                                    type="category"
-                                    dataKey="Feature"
-                                    tick={{ fill: "#8b949e", fontSize: 12 }}
-                                    width={90}
-                                />
-                                <Tooltip
-                                    contentStyle={{
-                                        background: "#1a1f2e",
-                                        border: "1px solid #2d3748",
-                                        borderRadius: "8px",
-                                    }}
-                                    labelStyle={{ color: "#e6edf3" }}
-                                    itemStyle={{ color: "#e6edf3" }}
-                                />
-                                <Bar dataKey="Importance" radius={[0, 4, 4, 0]}>
-                                    {importanceChartData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={entry.fill} />
-                                    ))}
-                                </Bar>
-                            </BarChart>
-                        </ResponsiveContainer>
+                        <div className="chart-scroll-wrapper">
+                            <ResponsiveContainer width="100%" height={300}>
+                                <BarChart
+                                    data={importanceChartData}
+                                    layout="vertical"
+                                    margin={{ top: 10, right: 30, left: 100, bottom: 10 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
+                                    <XAxis type="number" tick={{ fill: "#8b949e" }} />
+                                    <YAxis
+                                        type="category"
+                                        dataKey="Feature"
+                                        tick={{ fill: "#8b949e", fontSize: 12 }}
+                                        width={90}
+                                    />
+                                    <Tooltip
+                                        contentStyle={{
+                                            background: "#1a1f2e",
+                                            border: "1px solid #2d3748",
+                                            borderRadius: "8px",
+                                        }}
+                                        labelStyle={{ color: "#e6edf3" }}
+                                        itemStyle={{ color: "#e6edf3" }}
+                                    />
+                                    <Bar dataKey="Importance" radius={[0, 4, 4, 0]}>
+                                        {importanceChartData.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={entry.fill} />
+                                        ))}
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
                     <p className="importance-legend">
                         <span className="legend-dot cyan"></span> Increases prediction
@@ -421,65 +423,67 @@ export default function Predictions() {
                     </div>
 
                     <div className="scatter-container">
-                        <ResponsiveContainer width="100%" height={500}>
-                            <ScatterChart margin={{ top: 20, right: 30, bottom: 60, left: 60 }}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
-                                <XAxis
-                                    type="number"
-                                    dataKey="Actual"
-                                    name="Actual"
-                                    domain={[zoomedDomain.xMin, zoomedDomain.xMax]}
-                                    tick={{ fill: "#8b949e" }}
-                                    label={{
-                                        value: `Actual ${targetStat}`,
-                                        position: "bottom",
-                                        offset: 40,
-                                        fill: "#8b949e",
-                                    }}
-                                    allowDataOverflow
-                                />
-                                <YAxis
-                                    type="number"
-                                    dataKey="Predicted"
-                                    name="Predicted"
-                                    domain={[zoomedDomain.yMin, zoomedDomain.yMax]}
-                                    tick={{ fill: "#8b949e" }}
-                                    label={{
-                                        value: `Predicted ${targetStat}`,
-                                        angle: -90,
-                                        position: "left",
-                                        offset: 40,
-                                        fill: "#8b949e",
-                                    }}
-                                    allowDataOverflow
-                                />
-                                <Tooltip content={<CustomTooltip />} />
-                                <ReferenceLine
-                                    segment={[
-                                        { x: zoomedDomain.xMin, y: zoomedDomain.xMin },
-                                        { x: zoomedDomain.xMax, y: zoomedDomain.xMax },
-                                    ]}
-                                    stroke="#ff6b5b"
-                                    strokeDasharray="5 5"
-                                    strokeWidth={2}
-                                />
-                                {/* Regular scatter points */}
-                                <Scatter
-                                    data={predictions.filter(p => p.Player !== highlightedPlayer)}
-                                    fill="#4dc9ff"
-                                    fillOpacity={highlightedPlayer ? 0.3 : 0.7}
-                                />
-                                {/* Highlighted player */}
-                                {highlightedPlayer && (
-                                    <Scatter
-                                        data={predictions.filter(p => p.Player === highlightedPlayer)}
-                                        fill="#fbbf24"
-                                        fillOpacity={1}
-                                        shape="star"
+                        <div className="chart-scroll-wrapper">
+                            <ResponsiveContainer width="100%" height={500}>
+                                <ScatterChart margin={{ top: 20, right: 30, bottom: 60, left: 60 }}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
+                                    <XAxis
+                                        type="number"
+                                        dataKey="Actual"
+                                        name="Actual"
+                                        domain={[zoomedDomain.xMin, zoomedDomain.xMax]}
+                                        tick={{ fill: "#8b949e" }}
+                                        label={{
+                                            value: `Actual ${targetStat}`,
+                                            position: "bottom",
+                                            offset: 40,
+                                            fill: "#8b949e",
+                                        }}
+                                        allowDataOverflow
                                     />
-                                )}
-                            </ScatterChart>
-                        </ResponsiveContainer>
+                                    <YAxis
+                                        type="number"
+                                        dataKey="Predicted"
+                                        name="Predicted"
+                                        domain={[zoomedDomain.yMin, zoomedDomain.yMax]}
+                                        tick={{ fill: "#8b949e" }}
+                                        label={{
+                                            value: `Predicted ${targetStat}`,
+                                            angle: -90,
+                                            position: "left",
+                                            offset: 40,
+                                            fill: "#8b949e",
+                                        }}
+                                        allowDataOverflow
+                                    />
+                                    <Tooltip content={<CustomTooltip />} />
+                                    <ReferenceLine
+                                        segment={[
+                                            { x: zoomedDomain.xMin, y: zoomedDomain.xMin },
+                                            { x: zoomedDomain.xMax, y: zoomedDomain.xMax },
+                                        ]}
+                                        stroke="#ff6b5b"
+                                        strokeDasharray="5 5"
+                                        strokeWidth={2}
+                                    />
+                                    {/* Regular scatter points */}
+                                    <Scatter
+                                        data={predictions.filter(p => p.Player !== highlightedPlayer)}
+                                        fill="#4dc9ff"
+                                        fillOpacity={highlightedPlayer ? 0.3 : 0.7}
+                                    />
+                                    {/* Highlighted player */}
+                                    {highlightedPlayer && (
+                                        <Scatter
+                                            data={predictions.filter(p => p.Player === highlightedPlayer)}
+                                            fill="#fbbf24"
+                                            fillOpacity={1}
+                                            shape="star"
+                                        />
+                                    )}
+                                </ScatterChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
                     <p className="chart-legend">
                         <span className="legend-line"></span> Perfect prediction line (y = x)
@@ -494,57 +498,61 @@ export default function Predictions() {
                         {/* Overperformers */}
                         <div className="performers-table">
                             <h3>Top 5 Overperformers</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Player</th>
-                                        <th>Predicted</th>
-                                        <th>Actual</th>
-                                        <th>Error</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {[...predictions]
-                                        .sort((a, b) => a.Error - b.Error)
-                                        .slice(0, 5)
-                                        .map((p, i) => (
-                                            <tr key={i}>
-                                                <td className="player-name">{p.Player}</td>
-                                                <td>{p.Predicted.toFixed(3)}</td>
-                                                <td>{p.Actual.toFixed(3)}</td>
-                                                <td className="error-cell overperform">{p.Error.toFixed(3)}</td>
-                                            </tr>
-                                        ))}
-                                </tbody>
-                            </table>
+                            <div className="table-scroll-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Player</th>
+                                            <th>Predicted</th>
+                                            <th>Actual</th>
+                                            <th>Error</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[...predictions]
+                                            .sort((a, b) => a.Error - b.Error)
+                                            .slice(0, 5)
+                                            .map((p, i) => (
+                                                <tr key={i}>
+                                                    <td className="player-name">{p.Player}</td>
+                                                    <td>{p.Predicted.toFixed(3)}</td>
+                                                    <td>{p.Actual.toFixed(3)}</td>
+                                                    <td className="error-cell overperform">{p.Error.toFixed(3)}</td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
 
                         {/* Underperformers */}
                         <div className="performers-table">
                             <h3>Top 5 Underperformers</h3>
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Player</th>
-                                        <th>Predicted</th>
-                                        <th>Actual</th>
-                                        <th>Error</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {[...predictions]
-                                        .sort((a, b) => b.Error - a.Error)
-                                        .slice(0, 5)
-                                        .map((p, i) => (
-                                            <tr key={i}>
-                                                <td className="player-name">{p.Player}</td>
-                                                <td>{p.Predicted.toFixed(3)}</td>
-                                                <td>{p.Actual.toFixed(3)}</td>
-                                                <td className="error-cell underperform">+{p.Error.toFixed(3)}</td>
-                                            </tr>
-                                        ))}
-                                </tbody>
-                            </table>
+                            <div className="table-scroll-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Player</th>
+                                            <th>Predicted</th>
+                                            <th>Actual</th>
+                                            <th>Error</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[...predictions]
+                                            .sort((a, b) => b.Error - a.Error)
+                                            .slice(0, 5)
+                                            .map((p, i) => (
+                                                <tr key={i}>
+                                                    <td className="player-name">{p.Player}</td>
+                                                    <td>{p.Predicted.toFixed(3)}</td>
+                                                    <td>{p.Actual.toFixed(3)}</td>
+                                                    <td className="error-cell underperform">+{p.Error.toFixed(3)}</td>
+                                                </tr>
+                                            ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </section>

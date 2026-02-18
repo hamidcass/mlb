@@ -1385,3 +1385,266 @@ nav a.active {
   border: 1px solid var(--border-color);
   margin-top: 1rem;
 }
+
+/* ========================================
+   Mobile Responsive Overrides
+   ======================================== */
+
+/* Chart scroll wrapper – used in JSX to wrap charts for horizontal scroll on mobile */
+.chart-scroll-wrapper {
+  width: 100%;
+}
+
+.table-scroll-wrapper {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+
+  /* ---- Global Layout ---- */
+  .page-container {
+    padding: 5.5rem 1rem 2rem;
+  }
+
+  .hero-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .hero-header .subtitle {
+    font-size: 1rem;
+  }
+
+  .hero-description {
+    font-size: 0.85rem;
+  }
+
+  /* ---- Control Panel ---- */
+  .control-panel {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 1.25rem;
+    gap: 1rem;
+  }
+
+  .control-group select {
+    min-width: unset;
+    width: 100%;
+  }
+
+  .btn-primary {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+  }
+
+  /* ---- Feature Importance Chart ---- */
+  .importance-chart-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .chart-scroll-wrapper {
+    min-width: 500px;
+  }
+
+  /* ---- Scatter Chart ---- */
+  .scatter-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 1rem 0.5rem;
+  }
+
+  .scatter-container .chart-scroll-wrapper {
+    min-width: 580px;
+  }
+
+  /* ---- Zoom Controls ---- */
+  .zoom-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .zoom-control-group {
+    width: 100%;
+  }
+
+  .zoom-slider {
+    flex: 1;
+    width: auto;
+  }
+
+  .btn-reset {
+    margin-left: 0;
+    width: 100%;
+    text-align: center;
+    padding: 0.65rem 1rem;
+  }
+
+  /* ---- Player Search ---- */
+  .player-search {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .search-results {
+    width: 100%;
+  }
+
+  /* ---- Performers Tables ---- */
+  .performers-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .table-scroll-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .performers-table table {
+    min-width: 400px;
+  }
+
+  /* ---- Stat Cards ---- */
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.75rem;
+  }
+
+  .stat-card {
+    padding: 1.25rem;
+  }
+
+  /* ---- Prediction Cards (Search Page) ---- */
+  .prediction-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .prediction-value {
+    font-size: 1.75rem;
+  }
+
+  .prediction-grade {
+    font-size: 2.25rem;
+  }
+
+  /* ---- Search Page ---- */
+  .search-page {
+    padding-top: 5.5rem;
+  }
+
+  .player-title {
+    font-size: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .player-info-grid {
+    gap: 1.5rem;
+  }
+
+  .prediction-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* ---- History Chart ---- */
+  .history-chart-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 1rem 0.5rem;
+  }
+
+  .history-chart-container .chart-scroll-wrapper {
+    min-width: 500px;
+  }
+
+  /* ---- Info Banner ---- */
+  .info-banner {
+    flex-wrap: wrap;
+    padding: 1rem;
+    font-size: 0.85rem;
+  }
+
+  /* ---- Metrics ---- */
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+
+  /* ---- Misc ---- */
+  .chart-section h2 {
+    font-size: 1.25rem;
+  }
+
+  .chart-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .importance-legend {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .chart-legend {
+    font-size: 0.75rem;
+  }
+
+  /* ---- Skeletons ---- */
+  .skeleton-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skeleton-performers-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .skeleton-prediction-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .skeleton-chart {
+    height: 350px;
+  }
+
+  .skeleton-importance {
+    height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding: 5rem 0.75rem 1.5rem;
+  }
+
+  .hero-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .control-panel {
+    padding: 1rem;
+  }
+}

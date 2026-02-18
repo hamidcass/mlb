@@ -272,71 +272,73 @@ export default function Search() {
                         <section className="history-section">
                             <h2 className="section-title">Historical Performance</h2>
                             <div className="history-chart-container">
-                                <ResponsiveContainer width="100%" height={350}>
-                                    <LineChart
-                                        data={chartData}
-                                        margin={{ top: 20, right: 80, bottom: 20, left: 40 }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
-                                        <XAxis
-                                            dataKey="Season"
-                                            tick={{ fill: "#8b949e" }}
-                                            tickFormatter={(val) => val.toString()}
-                                        />
-                                        <YAxis
-                                            domain={["auto", "auto"]}
-                                            tick={{ fill: "#8b949e" }}
-                                            tickFormatter={(val) => val.toFixed(2)}
-                                            label={{
-                                                value: "OPS",
-                                                angle: -90,
-                                                position: "insideLeft",
-                                                fill: "#8b949e",
-                                            }}
-                                        />
-                                        <Tooltip
-                                            contentStyle={{
-                                                background: "#1a222d",
-                                                border: "1px solid #2d3748",
-                                                borderRadius: "8px",
-                                            }}
-                                            labelStyle={{ color: "#f0f6fc" }}
-                                        />
-                                        <Legend
-                                            verticalAlign="top"
-                                            align="right"
-                                            wrapperStyle={{ paddingBottom: 20 }}
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="Actual"
-                                            stroke="#4dc9ff"
-                                            strokeWidth={2}
-                                            dot={{ fill: "#4dc9ff", r: 5 }}
-                                            activeDot={{ r: 7 }}
-                                            name="Actual"
-                                        />
-                                        <Line
-                                            type="monotone"
-                                            dataKey="Predicted"
-                                            stroke="#ff6b5b"
-                                            strokeWidth={2}
-                                            strokeDasharray="5 5"
-                                            dot={{ fill: "#ff6b5b", r: 5 }}
-                                            name="Prediction"
-                                            connectNulls={false}
-                                        />
-                                        {opsPrediction && (
-                                            <ReferenceDot
-                                                x={2025}
-                                                y={opsPrediction.Predicted}
-                                                r={6}
-                                                fill="#ff6b5b"
-                                                stroke="#ff6b5b"
+                                <div className="chart-scroll-wrapper">
+                                    <ResponsiveContainer width="100%" height={350}>
+                                        <LineChart
+                                            data={chartData}
+                                            margin={{ top: 20, right: 80, bottom: 20, left: 40 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#2d3748" />
+                                            <XAxis
+                                                dataKey="Season"
+                                                tick={{ fill: "#8b949e" }}
+                                                tickFormatter={(val) => val.toString()}
                                             />
-                                        )}
-                                    </LineChart>
-                                </ResponsiveContainer>
+                                            <YAxis
+                                                domain={["auto", "auto"]}
+                                                tick={{ fill: "#8b949e" }}
+                                                tickFormatter={(val) => val.toFixed(2)}
+                                                label={{
+                                                    value: "OPS",
+                                                    angle: -90,
+                                                    position: "insideLeft",
+                                                    fill: "#8b949e",
+                                                }}
+                                            />
+                                            <Tooltip
+                                                contentStyle={{
+                                                    background: "#1a222d",
+                                                    border: "1px solid #2d3748",
+                                                    borderRadius: "8px",
+                                                }}
+                                                labelStyle={{ color: "#f0f6fc" }}
+                                            />
+                                            <Legend
+                                                verticalAlign="top"
+                                                align="right"
+                                                wrapperStyle={{ paddingBottom: 20 }}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="Actual"
+                                                stroke="#4dc9ff"
+                                                strokeWidth={2}
+                                                dot={{ fill: "#4dc9ff", r: 5 }}
+                                                activeDot={{ r: 7 }}
+                                                name="Actual"
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="Predicted"
+                                                stroke="#ff6b5b"
+                                                strokeWidth={2}
+                                                strokeDasharray="5 5"
+                                                dot={{ fill: "#ff6b5b", r: 5 }}
+                                                name="Prediction"
+                                                connectNulls={false}
+                                            />
+                                            {opsPrediction && (
+                                                <ReferenceDot
+                                                    x={2025}
+                                                    y={opsPrediction.Predicted}
+                                                    r={6}
+                                                    fill="#ff6b5b"
+                                                    stroke="#ff6b5b"
+                                                />
+                                            )}
+                                        </LineChart>
+                                    </ResponsiveContainer>
+                                </div>
                             </div>
                         </section>
                     )}
